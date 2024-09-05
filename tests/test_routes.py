@@ -236,3 +236,36 @@ class TestAccountService(TestCase):
         )
         # Check response code for successful deletion of account from db
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    ###################
+    #  LIST ACCOUNTS  #
+    ###################
+
+    def test_get_accounts_list(self):
+        """Get a list of all accounts"""
+        # Use helper method to create 5 accounts
+        self._create_accounts(5)
+        # Attempt to get the list of accounts from the db
+        response = self.client.get(
+            f"{BASE_URL}",
+            content_type="application/json"
+        )
+        # Check response code for successful get request
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Get the accounts data from the response
+        accounts = response.get_json()
+        # Check that 5 accounts were received in the response
+        self.assertEqual(len(accounts), 5)
+
+    ####################
+    #  ERROR HANDLERS  #
+    ####################
+
+    def test_method_not_allowed(self):
+        """Shouldn't allow illegal method calls"""
+        # Use delete on a route that does not implement it
+        response = self.client.delete(
+            f"{BASE_URL}"
+        )
+        # Test the response code
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

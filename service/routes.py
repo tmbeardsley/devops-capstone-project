@@ -61,7 +61,22 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-# ... place you code here to LIST accounts ...
+@app.route("/accounts", methods=["GET"])
+def list_accounts():
+    """
+    List all accounts in the db
+    """
+    app.logger.info("Request to list all accounts")
+    # Get a list of all account objects in the db
+    account_list = Account.all()
+    # Create list of serialized accounts
+    account_list_serial = []
+    for account in account_list:
+        account_list_serial.append(account.serialize())
+    # Log total number of accounts being returned
+    app.logger.info("%s accounts being returned", len(account_list_serial))
+    # Return the list as json using flasks jsonify library
+    return jsonify(account_list_serial), status.HTTP_200_OK
 
 
 ######################################################################
@@ -74,6 +89,7 @@ def read_account(id):
     Reads an Account
     This endpoint will read an Account based upon the id in the route
     """
+    app.logger.info("Request to retrieve the account with id: %s", id)
     # Attempt to retrieve an account by id
     account = Account.find(id)
     # Abort if account could not be retrieved
