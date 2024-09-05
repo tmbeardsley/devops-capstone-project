@@ -12,6 +12,8 @@ from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
 from service.models import db, Account, init_db
 from service.routes import app
+import string
+import random
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -123,7 +125,9 @@ class TestAccountService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-    # ADD YOUR TEST CASES HERE ...
+    ##################
+    #  READ ACCOUNT  #
+    ##################
 
     def test_read_an_account(self):
         """It should read an existing account"""
@@ -157,5 +161,53 @@ class TestAccountService(TestCase):
         response = self.client.get(
             f"{BASE_URL}/0",
             content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    ####################
+    #  UPDATE ACCOUNT  #
+    ####################
+
+    def test_update_account(self):
+        """Attempt to update an existing Account"""
+        # Create an account
+        account = AccountFactory()
+        # Post the account data
+        response = self.client.post(
+            BASE_URL,
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        # Check response code for successful account creation in db
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # Get account data from response
+        account_new = response.get_json()
+        # Change the name by appending a random lower case letter (ensures uniqueness)
+        name_new = account_new["name"]
+        while True:
+            name_new = name_new + random.choice(string.ascii_lowercase)
+            if name_new != account_new["name"]:
+                break
+        account_new["name"] = name_new
+        # Update the account in the db with a put request
+        response2 = self.client.put(
+            f"{BASE_URL}/{account_new['id']}",
+            json=account_new
+        )
+        # Check the response code of the put request
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        # Get the updated account data from the response
+        account_updated = response2.get_json()
+        # Check that the name was successfully updated
+        self.assertEqual(account_updated["name"], name_new)
+    
+    def test_update_account_not_found(self):
+        """Attempt to update an account that doesn't exist"""
+        # Create an account object
+        account = AccountFactory()
+        # Try to update account in the db wthat doesn't exist
+        response = self.client.put(
+            f"{BASE_URL}/0",
+            json=account.serialize()
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -87,8 +87,24 @@ def read_account(id):
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
-# ... place you code here to UPDATE an account ...
-
+@app.route("/accounts/<int:id>", methods=["PUT"])
+def update_account(id):
+    """
+    Update an account
+    This endpoint will update an Account based upon the id in the route
+    """
+    app.logger.info("Request to update the account with id: %s", id)
+    # Attempt to retrieve an account by id
+    account = Account.find(id)
+    # Abort if account could not be retrieved
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id [{id}] couldn't be found.")
+    # Use the python dictionary provided in the request to update the account object
+    account.deserialize(request.get_json())
+    # Update the account data in the db
+    account.update()
+    # Return the updated account as a python dictionary
+    return account.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # DELETE AN ACCOUNT
