@@ -68,8 +68,20 @@ def create_accounts():
 # READ AN ACCOUNT
 ######################################################################
 
-# ... place you code here to READ an account ...
-
+@app.route("/accounts/<int:id>", methods=["GET"])
+def read_account(id):
+    """
+    Reads an Account
+    This endpoint will read an Account based upon the id in the route
+    """
+    # Attempt to retrieve an account by id
+    account = Account.find(id)
+    # Abort if account could not be retrieved
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id [{id}] couldn't be found.")
+    # Serialize account object into a python dictionary
+    account_data = account.serialize()
+    return account_data, status.HTTP_200_OK 
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
@@ -88,7 +100,6 @@ def create_accounts():
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
-
 
 def check_content_type(media_type):
     """Checks that the media type is correct"""
