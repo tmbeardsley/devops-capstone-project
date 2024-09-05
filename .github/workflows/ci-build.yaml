@@ -1,0 +1,8 @@
+name: CI Build
+
+# triggers
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
