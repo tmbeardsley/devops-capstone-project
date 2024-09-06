@@ -155,7 +155,7 @@ class TestAccountService(TestCase):
         self.assertEqual(account2["address"], account.address)
         self.assertEqual(account2["phone_number"], account.phone_number)
         self.assertEqual(account2["date_joined"], str(account.date_joined))
-    
+
     def test_account_not_found(self):
         """Attempt to read an account that doesn't exist"""
         response = self.client.get(
@@ -200,7 +200,7 @@ class TestAccountService(TestCase):
         account_updated = response2.get_json()
         # Check that the name was successfully updated
         self.assertEqual(account_updated["name"], name_new)
-    
+
     def test_update_account_not_found(self):
         """Attempt to update an account that doesn't exist"""
         # Create an account object
