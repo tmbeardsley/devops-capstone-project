@@ -9,9 +9,15 @@ from flask import Flask
 from service import config
 from service.common import log_handlers
 
+# import flask-talisman
+from flask_talisman import Talisman
+
 # Create Flask application
 app = Flask(__name__)
 app.config.from_object(config)
+
+# Create instance of the Talisman class
+talisman = Talisman(app)
 
 # Import the routes After the Flask app is created
 # pylint: disable=wrong-import-position, cyclic-import, wrong-import-order
